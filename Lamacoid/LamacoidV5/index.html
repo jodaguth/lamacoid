@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Permanent ID Label Generator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@500;600&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-shell">
+        <header class="app-bar">
+            <div class="app-bar__brand">
+                <div class="app-bar__glyph">ID</div>
+                <div class="app-bar__text">
+                    <p class="app-bar__kicker">Lamacoid Studio</p>
+                    <h1 class="app-bar__title">Permanent ID Label Generator</h1>
+                </div>
+            </div>
+            <div class="app-bar__actions">
+                <span class="status-chip status-chip--accent">Live Preview</span>
+                <span class="status-chip">SVG Export Ready</span>
+            </div>
+        </header>
+
+        <section class="hero">
+            <h2 class="hero__title">Design crisp, compliant labels with a Material You inspired workspace.</h2>
+            <p class="hero__copy">
+                Configure dimensions, typography, and colors using adaptive controls. Preview your label at 1:1 scale and export production-ready SVG files instantly.
+            </p>
+            <div class="hero__meta">
+                <span>Real-time updates</span>
+                <span>Supports multiple labels per project</span>
+                <span>Fine-grained typographic controls</span>
+            </div>
+        </section>
+
+        <main class="layout">
+            <section class="panel sidebar">
+                <h2>Project</h2>
+                <fieldset>
+                    <legend>Project Details</legend>
+                    <label>
+                        Project Name
+                        <input type="text" id="projectName" placeholder="Untitled Project">
+                    </label>
+                    <div class="label-list-header">
+                        <span>Labels</span>
+                        <button type="button" id="addLabelBtn" class="button secondary">Add Label</button>
+                    </div>
+                    <ul id="labelList" class="label-list" role="listbox" aria-label="Labels in project"></ul>
+                    <div class="label-actions-inline">
+                        <button type="button" id="duplicateLabelBtn" class="button secondary" disabled>Duplicate</button>
+                        <button type="button" id="removeLabelBtn" class="button" disabled>Remove</button>
+                    </div>
+                    <div class="project-actions">
+                        <button type="button" id="saveProjectBtn" class="button">Save Project</button>
+                        <button type="button" id="openProjectBtn" class="button secondary">Open Project</button>
+                        <input type="file" id="projectFileInput" accept="application/json" hidden>
+                    </div>
+                </fieldset>
+            </section>
+
+            <form id="labelForm" class="workspace">
+                <section class="panel label-settings">
+                    <h2>Label Settings</h2>
+                    <fieldset>
+                        <legend>Dimensions &amp; Appearance</legend>
+                        <label>
+                            Label Name
+                            <input type="text" id="labelName" placeholder="Label name">
+                        </label>
+                        <div class="dimension-grid">
+                            <label>
+                                Width (mm)
+                                <input type="number" id="labelWidth" min="10" step="1" value="100" required>
+                            </label>
+                            <label>
+                                Height (mm)
+                                <input type="number" id="labelHeight" min="10" step="1" value="50" required>
+                            </label>
+                            <label>
+                                Corner Radius (mm)
+                                <input type="number" id="cornerRadius" min="0" step="0.5" value="4">
+                            </label>
+                            <label>
+                                Border Thickness (mm)
+                                <input type="number" id="borderThickness" min="0" step="0.1" value="0.5">
+                            </label>
+                            <label>
+                                Canvas Margin (mm)
+                                <input type="number" id="canvasMargin" min="0" step="0.1" value="0.2">
+                            </label>
+                        </div>
+                        <div class="checkbox-row">
+                            <label class="checkbox-option">
+                                <span>Auto Border</span>
+                                <input type="checkbox" id="autoBorder">
+                            </label>
+                            <label>
+                                Auto Padding (mm)
+                                <input type="number" id="autoPadding" min="0" step="0.1" value="2">
+                            </label>
+                        </div>
+                        <div class="color-row">
+                            <label>
+                                Background Color
+                                <input type="color" id="backgroundColor" value="#f2f2f2">
+                            </label>
+                            <label>
+                                Text Color
+                                <input type="color" id="textColor" value="#000000">
+                            </label>
+                        </div>
+                    </fieldset>
+                    <div class="actions">
+                        <button type="button" id="exportSvgBtn" class="button primary">Export SVG</button>
+                        <button type="reset" class="button secondary">Reset</button>
+                    </div>
+                </section>
+
+                <section class="panel preview-panel">
+                    <h2>Preview</h2>
+                    <div id="previewContainer" class="preview-canvas" aria-live="polite"></div>
+                    <p class="scale-note">Preview renders 1:1 (screen limitations may apply).</p>
+                </section>
+
+                <section class="panel text-lines-panel">
+                    <h2>Text Lines</h2>
+                    <div class="stack-row">
+                        <label>
+                            Letter Spacing (mm)
+                            <input type="number" id="letterSpacing" min="0" step="0.1" value="0">
+                        </label>
+                    </div>
+                    <div id="linesContainer" class="lines"></div>
+                    <button type="button" id="addLineBtn" class="button secondary">Add Line</button>
+                </section>
+            </form>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/opentype.js@1.3.4/dist/opentype.min.js" defer></script>
+    <script src="script.js" defer></script>
+</body>
+</html>

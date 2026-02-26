@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Permanent ID Label Generator</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+</head>
+<body>
+    <main class="layout">
+        <section class="panel sidebar">
+            <h1>Project</h1>
+            <fieldset>
+                <legend>Project Details</legend>
+                <label>
+                    Project Name
+                    <input type="text" id="projectName" placeholder="Untitled Project">
+                </label>
+                <div class="label-list-header">
+                    <span>Labels</span>
+                    <button type="button" id="addLabelBtn" class="button secondary">Add Label</button>
+                </div>
+                <ul id="labelList" class="label-list" role="listbox" aria-label="Labels in project"></ul>
+                <div class="label-actions-inline">
+                    <button type="button" id="duplicateLabelBtn" class="button secondary" disabled>Duplicate</button>
+                    <button type="button" id="removeLabelBtn" class="button" disabled>Remove</button>
+                </div>
+                <div class="project-actions">
+                    <button type="button" id="saveProjectBtn" class="button">Save Project</button>
+                    <button type="button" id="openProjectBtn" class="button secondary">Open Project</button>
+                    <input type="file" id="projectFileInput" accept="application/json" hidden>
+                </div>
+            </fieldset>
+        </section>
+
+        <form id="labelForm" class="workspace">
+            <section class="panel label-settings">
+                <h2>Label Settings</h2>
+                <fieldset>
+                    <legend>Dimensions & Appearance</legend>
+                    <label>
+                        Label Name
+                        <input type="text" id="labelName" placeholder="Label name">
+                    </label>
+                    <div class="dimension-grid">
+                        <label>
+                            Width (mm)
+                            <input type="number" id="labelWidth" min="10" step="1" value="100" required>
+                        </label>
+                        <label>
+                            Height (mm)
+                            <input type="number" id="labelHeight" min="10" step="1" value="50" required>
+                        </label>
+                        <label>
+                            Corner Radius (mm)
+                            <input type="number" id="cornerRadius" min="0" step="0.5" value="4">
+                        </label>
+                        <label>
+                            Border Thickness (mm)
+                            <input type="number" id="borderThickness" min="0" step="0.1" value="0.5">
+                        </label>
+                        <label>
+                            Canvas Margin (mm)
+                            <input type="number" id="canvasMargin" min="0" step="0.1" value="0.2">
+                        </label>
+                    </div>
+                    <div class="checkbox-row">
+                        <label class="checkbox-option">
+                            <span>Auto Border</span>
+                            <input type="checkbox" id="autoBorder">
+                        </label>
+                        <label>
+                            Auto Padding (mm)
+                            <input type="number" id="autoPadding" min="0" step="0.1" value="2">
+                        </label>
+                    </div>
+                    <div class="color-row">
+                        <label>
+                            Background Color
+                            <input type="color" id="backgroundColor" value="#f2f2f2">
+                        </label>
+                        <label>
+                            Text Color
+                            <input type="color" id="textColor" value="#000000">
+                        </label>
+                    </div>
+                </fieldset>
+                <div class="actions">
+                    <button type="button" id="exportSvgBtn" class="button primary">Export SVG</button>
+                    <button type="reset" class="button">Reset</button>
+                </div>
+            </section>
+
+            <section class="panel preview-panel">
+                <h2>Preview</h2>
+                <div id="previewContainer" class="preview-canvas" aria-live="polite"></div>
+                <p class="scale-note">Preview is rendered at 1:1 scale (screen limitations may apply).</p>
+            </section>
+
+            <section class="panel text-lines-panel">
+                <h2>Text Lines</h2>
+                <div class="stack-row">
+                    <label>
+                        Letter Spacing (mm)
+                        <input type="number" id="letterSpacing" min="0" step="0.1" value="0">
+                    </label>
+                </div>
+                <div id="linesContainer" class="lines"></div>
+                <button type="button" id="addLineBtn" class="button secondary">Add Line</button>
+            </section>
+        </form>
+    </main>
+    <script src="script.js" defer></script>
+</body>
+</html>

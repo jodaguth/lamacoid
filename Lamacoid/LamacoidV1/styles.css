@@ -1,0 +1,438 @@
+    color-scheme: light;
+    font-family: "Segoe UI", Arial, sans-serif;
+    background-color: #f8f8f8;
+    color: #1f1f1f;
+}
+
+body {
+    margin: 0;
+}
+
+main.layout {
+    display: grid;
+    grid-template-columns: minmax(260px, 320px) 1fr;
+    gap: 2rem;
+    padding: 2rem;
+    min-height: 100vh;
+    box-sizing: border-box;
+}
+
+.workspace {
+    display: grid;
+    grid-template-columns: minmax(160px, 0.8fr) minmax(160px, 0.8fr);
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+        "labelSettings textLines"
+        "preview preview";
+    gap: 0.45rem;
+    height: 100%;
+}
+
+.panel {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 0 24px rgba(0, 0, 0, 0.08);
+    padding: 1.5rem;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.label-settings,
+.text-lines-panel {
+    padding: 0.3rem;
+    gap: 0.15rem;
+}
+
+.label-settings {
+    grid-area: labelSettings;
+}
+
+.text-lines-panel {
+    grid-area: textLines;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.panel h1,
+.panel h2 {
+    margin: 0 0 0.5rem;
+    font-size: 1.5rem;
+}
+
+.panel fieldset {
+    border: 1px solid #dedede;
+    border-radius: 8px;
+    padding: 0.3rem;
+    margin: 0 0 0.3rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.22rem;
+}
+
+.label-settings fieldset {
+    padding: 0.28rem;
+    gap: 0.25rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(115px, 1fr));
+    column-gap: 0.35rem;
+    row-gap: 0.25rem;
+    align-items: end;
+}
+
+legend {
+    font-weight: 600;
+    font-size: 0.75rem;
+    padding: 0 0.15rem;
+}
+
+.sidebar fieldset {
+    flex: 1 1 auto;
+}
+
+.dimension-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    gap: 0.25rem;
+}
+
+.checkbox-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    gap: 0.25rem;
+    align-items: end;
+}
+
+.color-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    gap: 0.25rem;
+}
+
+label {
+    font-size: 0.95rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.label-settings label {
+    font-size: 0.68rem;
+    gap: 0.08rem;
+    min-width: 0;
+    line-height: 1.1;
+    align-items: flex-start;
+}
+
+.label-settings input[type="number"],
+.label-settings select,
+.label-settings input[type="color"],
+.label-settings input[type="text"] {
+    padding: 0.18rem 0.28rem;
+    font-size: 0.76rem;
+    width: 100%;
+    max-width: 110px;
+}
+
+.label-settings fieldset > label:first-child input {
+    max-width: none;
+}
+
+.checkbox-option {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.checkbox-option input[type="checkbox"] {
+    width: 1.1rem;
+    height: 1.1rem;
+}
+
+input[type="number"],
+select,
+input[type="color"] {
+    padding: 0.32rem 0.5rem;
+    font-size: 0.9rem;
+    border: 1px solid #cfcfcf;
+    border-radius: 6px;
+}
+
+input[type="color"] {
+    height: 1.9rem;
+    padding: 0.12rem;
+}
+
+.stack-row {
+    display: flex;
+    gap: 0.3rem;
+    flex-wrap: wrap;
+}
+
+.stack-row label {
+    flex: 1 1 120px;
+}
+
+.label-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.label-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+.label-list-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid #dedede;
+    border-radius: 8px;
+    background: #ffffff;
+    padding: 0.45rem 0.6rem;
+    gap: 0.75rem;
+}
+
+.label-list-item button {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.label-list-item.active {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.3);
+    background: #f3f6ff;
+}
+
+.label-list-item span.meta {
+    font-size: 0.8rem;
+    color: #5f5f5f;
+}
+
+.label-actions-inline {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.project-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.sidebar .project-actions {
+    margin-top: 1rem;
+}
+
+.lines {
+    display: flex;
+    flex-direction: column;
+    gap: 0.28rem;
+}
+
+.text-lines-panel .lines {
+    flex: 0 0 auto;
+    max-height: 10rem;
+    overflow-y: auto;
+    padding-right: 0.2rem;
+    min-height: 4.5rem;
+}
+
+.text-lines-panel #addLineBtn {
+    align-self: flex-start;
+    margin-top: 0.3rem;
+}
+
+.line-editor {
+    border: 1px solid #d8d8d8;
+    border-radius: 6px;
+    padding: 0.16rem 0.24rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    gap: 0.18rem;
+    align-items: end;
+    background-color: #fafafa;
+}
+
+.line-editor header {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+    font-size: 0.78rem;
+}
+
+.line-editor label {
+    font-size: 0.7rem;
+    gap: 0.12rem;
+}
+
+.line-editor input[type="text"],
+.line-editor input[type="number"],
+.line-editor select {
+    padding: 0.16rem 0.26rem;
+    font-size: 0.74rem;
+}
+
+.line-editor button {
+    border: none;
+    background: none;
+    color: #c0392b;
+    cursor: pointer;
+    font-size: 0.75rem;
+    padding: 0.08rem 0.16rem;
+}
+
+textarea {
+    resize: vertical;
+    min-height: 1.6rem;
+    padding: 0.18rem 0.26rem;
+    font-size: 0.74rem;
+    border-radius: 5px;
+    border: 1px solid #cfcfcf;
+    grid-column: 1 / -1;
+}
+
+.button {
+    padding: 0.6rem 1rem;
+    font-size: 1rem;
+    border-radius: 8px;
+    border: 1px solid #cfcfcf;
+    cursor: pointer;
+    background: #f5f5f5;
+    transition: filter 0.2s ease;
+}
+
+.button:hover {
+    filter: brightness(0.95);
+}
+
+.button.primary {
+    background: #2563eb;
+    color: #ffffff;
+    border-color: #2563eb;
+}
+
+.button.primary:hover {
+    filter: brightness(0.92);
+}
+
+.button.secondary {
+    background: #ffffff;
+}
+
+.actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.preview-panel {
+    grid-area: preview;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.preview-canvas {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    position: relative;
+}
+
+.preview-canvas svg {
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
+}
+
+.scale-note {
+    font-size: 0.85rem;
+    margin: 0;
+    color: #555555;
+}
+
+@media (max-width: 960px) {
+    main.layout {
+        grid-template-columns: 1fr;
+    }
+
+    .workspace {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto;
+        grid-template-areas:
+            "labelSettings"
+            "textLines"
+            "preview";
+    }
+}
+.label-settings.panel {
+    padding: 0.6rem 0.7rem;
+    gap: 0.3rem;
+}
+
+.label-settings h2 {
+    font-size: 1rem;
+    margin: 0;
+}
+
+.label-settings fieldset > label:first-child {
+    grid-column: 1 / -1;
+}
+
+.label-settings .dimension-grid,
+.label-settings .checkbox-row,
+.label-settings .color-row {
+    display: contents;
+}
+
+.label-settings .actions {
+    margin-top: 0.15rem;
+    gap: 0.35rem;
+    justify-content: flex-start;
+}
+
+.label-settings .actions .button {
+    padding: 0.4rem 0.65rem;
+    font-size: 0.8rem;
+}
+.text-lines-panel label {
+    font-size: 0.78rem;
+    gap: 0.12rem;
+}
+
+.text-lines-panel input[type="number"],
+.text-lines-panel select {
+    padding: 0.24rem 0.4rem;
+    font-size: 0.82rem;
+    max-width: 110px;
+}
+.text-lines-panel.panel {
+    padding: 0.75rem 0.9rem;
+    gap: 0.35rem;
+}
