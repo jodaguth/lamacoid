@@ -103,8 +103,28 @@
 
         <section class="panel preview">
             <h2>Preview</h2>
+            <div class="preview-toolbar">
+                <button type="button" id="toggleDisplaySettingsBtn" class="button secondary">Display & CNC Settings</button>
+            </div>
+            <div id="displaySettingsPanel" class="display-settings" hidden>
+                <h3>Display Calibration</h3>
+                <p>Hold a standard credit card against the guide and adjust until it matches (85.6 × 53.98 mm).</p>
+                <div id="creditCardGuide" class="credit-card-guide" aria-label="Credit card size guide"></div>
+                <label>
+                    Screen Scale (%)
+                    <input type="number" id="screenScalePercent" min="50" max="250" step="0.5" value="100">
+                </label>
+                <button type="button" id="resetScreenScaleBtn" class="button secondary">Reset Scale</button>
+
+                <h3>CNC Export</h3>
+                <label class="checkbox-option">
+                    <span>Export toolpath-friendly strokes</span>
+                    <input type="checkbox" id="toolpathFriendly">
+                </label>
+                <p class="scale-note">When enabled, export uses no fills and applies strokes for easier CAM path extraction.</p>
+            </div>
             <div id="previewContainer" class="preview-canvas" aria-live="polite"></div>
-            <p class="scale-note">Preview is rendered at 1:1 scale (screen limitations may apply).</p>
+            <p class="scale-note">Preview scale can be calibrated to your display using a credit card.</p>
         </section>
     </main>
     <script src="script.js" defer></script>

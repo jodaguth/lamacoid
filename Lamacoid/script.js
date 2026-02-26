@@ -1,6 +1,10 @@
 ﻿const MM_TO_PX = 96 / 25.4;
 const PT_TO_PX = 96 / 72;
+const PT_TO_MM = 25.4 / 72;
 const SVG_NS = "http://www.w3.org/2000/svg";
+const CREDIT_CARD_WIDTH_MM = 85.6;
+const CREDIT_CARD_HEIGHT_MM = 53.98;
+const SCREEN_SCALE_STORAGE_KEY = "lamacoid-screen-scale";
 
 const fonts = [
     { label: "Arial", value: "Arial, Helvetica, sans-serif" },
@@ -43,6 +47,12 @@ const removeLabelBtn = document.getElementById("removeLabelBtn");
 const saveProjectBtn = document.getElementById("saveProjectBtn");
 const openProjectBtn = document.getElementById("openProjectBtn");
 const projectFileInput = document.getElementById("projectFileInput");
+const toggleDisplaySettingsBtn = document.getElementById("toggleDisplaySettingsBtn");
+const displaySettingsPanel = document.getElementById("displaySettingsPanel");
+const creditCardGuide = document.getElementById("creditCardGuide");
+const screenScalePercentInput = document.getElementById("screenScalePercent");
+const resetScreenScaleBtn = document.getElementById("resetScreenScaleBtn");
+const toolpathFriendlyInput = document.getElementById("toolpathFriendly");
 
 const PROJECT_FILE_VERSION = 1;
 const ALLOWED_FONT_WEIGHTS = ["400", "500", "600", "700"];
@@ -54,6 +64,7 @@ const projectState = {
 
 let activeLabelId = null;
 let isHydratingForm = false;
+let screenScaleFactor = 1;
 
 function formatNumber(value, digits = 4) {
     if (!Number.isFinite(value)) {
@@ -157,6 +168,29 @@ function sanitizeLabel(rawLabel = {}, fallbackIndex = 0, seenIds = new Set()) {
         name: name || fallbackName,
         settings: sanitizeSettings(rawLabel.settings)
     };
+}
+
+function clamp(value, min, max) {
+    return Math.min(max, Math.max(min, value));
+}
+
+function getStoredScreenScaleFactor() {
+    const raw = window.localStorage.getItem(SCREEN_SCALE_STORAGE_KEY);
+    const numeric = Number(raw);
+    return Number.isFinite(numeric) ? clamp(numeric, 0.5, 2.5) : 1;
+}
+
+function persistScreenScaleFactor() {
+    window.localStorage.setItem(SCREEN_SCALE_STORAGE_KEY, String(screenScaleFactor));
+}
+
+function updateCreditCardGuideScale() {
+    const scale = Number.isFinite(screenScaleFactor) ? screenScaleFactor : 1;
+    const widthPx = mmToPx(CREDIT_CARD_WIDTH_MM) * scale;
+    const heightPx = mmToPx(CREDIT_CARD_HEIGHT_MM) * scale;
+    creditCardGuide.style.width = `${formatNumber(widthPx, 2)}px`;
+    creditCardGuide.style.height = `${formatNumber(heightPx, 2)}px`;
+    screenScalePercentInput.value = formatNumber(scale * 100, 2);
 }
 
 let measurementCanvas = null;
@@ -657,112 +691,108 @@ function handleProjectFileSelected(event) {
 }
 
 function buildSvg(settings) {
-    const widthPx = mmToPx(settings.widthMm);
-    const heightPx = mmToPx(settings.heightMm);
-    const cornerRadiusPx = mmToPx(settings.cornerRadiusMm);
-    const borderThicknessPx = mmToPx(settings.borderThicknessMm);
-    const lineSpacingPx = mmToPx(settings.lineSpacingMm);
-    const letterSpacingPx = mmToPx(settings.letterSpacingMm);
+    const widthMm = settings.widthMm;
+    const heightMm = settings.heightMm;
+    const cornerRadiusMm = settings.cornerRadiusMm;
+    const borderThicknessMm = settings.borderThicknessMm;
+    const lineSpacingMm = settings.lineSpacingMm;
+    const letterSpacingMm = settings.letterSpacingMm;
     const canvasMarginMm = Math.max(0, settings.canvasMarginMm || 0);
-    const canvasMarginPx = mmToPx(canvasMarginMm);
-    const canvasWidthMm = settings.widthMm + canvasMarginMm * 2;
-    const canvasHeightMm = settings.heightMm + canvasMarginMm * 2;
-    const canvasWidthPx = widthPx + canvasMarginPx * 2;
-    const canvasHeightPx = heightPx + canvasMarginPx * 2;
-    const originX = canvasMarginPx;
-    const originY = canvasMarginPx;
+    const canvasWidthMm = widthMm + canvasMarginMm * 2;
+    const canvasHeightMm = heightMm + canvasMarginMm * 2;
+    const originX = canvasMarginMm;
+    const originY = canvasMarginMm;
+    const toolpathFriendly = !!toolpathFriendlyInput.checked;
 
     const svg = document.createElementNS(SVG_NS, "svg");
     svg.setAttribute("xmlns", SVG_NS);
-    svg.setAttribute("width", `${canvasWidthMm}mm`);
-    svg.setAttribute("height", `${canvasHeightMm}mm`);
-    svg.setAttribute("viewBox", `0 0 ${formatNumber(canvasWidthPx)} ${formatNumber(canvasHeightPx)}`);
+    svg.setAttribute("width", `${formatNumber(canvasWidthMm, 4)}mm`);
+    svg.setAttribute("height", `${formatNumber(canvasHeightMm, 4)}mm`);
+    svg.setAttribute("viewBox", `0 0 ${formatNumber(canvasWidthMm, 4)} ${formatNumber(canvasHeightMm, 4)}`);
     svg.style.overflow = "visible";
     svg.setAttribute("role", "img");
 
     const rect = document.createElementNS(SVG_NS, "rect");
-    const strokeInsetPx = borderThicknessPx > 0 ? borderThicknessPx / 2 : 0;
-    const rectWidthPx = Math.max(0, widthPx - borderThicknessPx);
-    const rectHeightPx = Math.max(0, heightPx - borderThicknessPx);
-    const rectRadiusPx = Math.max(0, cornerRadiusPx - strokeInsetPx);
+    const strokeInsetMm = borderThicknessMm > 0 ? borderThicknessMm / 2 : 0;
+    const rectWidthMm = Math.max(0, widthMm - borderThicknessMm);
+    const rectHeightMm = Math.max(0, heightMm - borderThicknessMm);
+    const rectRadiusMm = Math.max(0, cornerRadiusMm - strokeInsetMm);
 
-    rect.setAttribute("x", formatNumber(originX + strokeInsetPx, 4));
-    rect.setAttribute("y", formatNumber(originY + strokeInsetPx, 4));
-    rect.setAttribute("width", formatNumber(rectWidthPx, 4));
-    rect.setAttribute("height", formatNumber(rectHeightPx, 4));
-    rect.setAttribute("rx", formatNumber(rectRadiusPx, 4));
-    rect.setAttribute("ry", formatNumber(rectRadiusPx, 4));
-    rect.setAttribute("fill", settings.backgroundColor);
+    rect.setAttribute("x", formatNumber(originX + strokeInsetMm, 4));
+    rect.setAttribute("y", formatNumber(originY + strokeInsetMm, 4));
+    rect.setAttribute("width", formatNumber(rectWidthMm, 4));
+    rect.setAttribute("height", formatNumber(rectHeightMm, 4));
+    rect.setAttribute("rx", formatNumber(rectRadiusMm, 4));
+    rect.setAttribute("ry", formatNumber(rectRadiusMm, 4));
+    rect.setAttribute("fill", toolpathFriendly ? "none" : settings.backgroundColor);
 
-    if (borderThicknessPx > 0) {
+    if (borderThicknessMm > 0) {
         rect.setAttribute("stroke", settings.textColor);
-        rect.setAttribute("stroke-width", formatNumber(borderThicknessPx, 4));
+        rect.setAttribute("stroke-width", formatNumber(borderThicknessMm, 4));
     } else {
-        rect.setAttribute("stroke", "none");
+        rect.setAttribute("stroke", toolpathFriendly ? settings.textColor : "none");
+        rect.setAttribute("stroke-width", toolpathFriendly ? "0.1" : "0");
     }
 
     svg.appendChild(rect);
 
     if (settings.lines.length > 0) {
         const lineCount = settings.lines.length;
-        const fontSizesPx = settings.lines.map(line => ptToPx(line.fontSizePt));
-        const totalTextHeightPx = fontSizesPx.reduce((acc, size, index) => {
-            return acc + size + (index > 0 ? lineSpacingPx : 0);
-        }, 0);
+        const fontSizesMm = settings.lines.map(line => line.fontSizePt * PT_TO_MM);
+        const totalTextHeightMm = fontSizesMm.reduce((acc, size, index) => acc + size + (index > 0 ? lineSpacingMm : 0), 0);
 
-        let baselineOffset = originY + (heightPx - totalTextHeightPx) / 2;
+        let baselineOffset = originY + (heightMm - totalTextHeightMm) / 2;
 
         if (lineCount % 2 === 0) {
             const gapIndex = lineCount / 2;
-            const sumFontBeforeGap = fontSizesPx.reduce((acc, size, index) => {
-                return index < gapIndex ? acc + size : acc;
-            }, 0);
-            const spacingBeforeGap = lineSpacingPx * Math.max(0, gapIndex - 1);
+            const sumFontBeforeGap = fontSizesMm.reduce((acc, size, index) => (index < gapIndex ? acc + size : acc), 0);
+            const spacingBeforeGap = lineSpacingMm * Math.max(0, gapIndex - 1);
             const baselineAtGap = baselineOffset + sumFontBeforeGap + spacingBeforeGap;
-            const centerY = originY + heightPx / 2;
-            const gapCenter = baselineAtGap + lineSpacingPx / 2;
-            const delta = centerY - gapCenter;
-            baselineOffset += delta;
+            const centerY = originY + heightMm / 2;
+            const gapCenter = baselineAtGap + lineSpacingMm / 2;
+            baselineOffset += centerY - gapCenter;
         } else {
             const middleIndex = Math.floor(lineCount / 2);
-            const sumFontThroughMiddle = fontSizesPx.reduce((acc, size, index) => {
-                return index <= middleIndex ? acc + size : acc;
-            }, 0);
-            const spacingBeforeMiddle = lineSpacingPx * middleIndex;
+            const sumFontThroughMiddle = fontSizesMm.reduce((acc, size, index) => (index <= middleIndex ? acc + size : acc), 0);
+            const spacingBeforeMiddle = lineSpacingMm * middleIndex;
             const baselineAtMiddle = baselineOffset + sumFontThroughMiddle + spacingBeforeMiddle;
-            const centerY = originY + heightPx / 2;
-            const middleLineCenter = baselineAtMiddle - fontSizesPx[middleIndex] / 2;
-            const delta = centerY - middleLineCenter;
-            baselineOffset += delta;
+            const centerY = originY + heightMm / 2;
+            const middleLineCenter = baselineAtMiddle - fontSizesMm[middleIndex] / 2;
+            baselineOffset += centerY - middleLineCenter;
         }
 
         let currentBaseline = baselineOffset;
 
         settings.lines.forEach((line, index) => {
-            const fontSizePx = fontSizesPx[index];
-            currentBaseline += fontSizePx;
+            const fontSizeMm = fontSizesMm[index];
+            currentBaseline += fontSizeMm;
             const textContent = (line.text || "").trim();
 
             if (textContent.length > 0) {
                 const textElement = document.createElementNS(SVG_NS, "text");
-                textElement.setAttribute("x", formatNumber(originX + widthPx / 2, 4));
+                textElement.setAttribute("x", formatNumber(originX + widthMm / 2, 4));
                 textElement.setAttribute("y", formatNumber(currentBaseline, 4));
-                textElement.setAttribute("fill", settings.textColor);
-                textElement.setAttribute("font-size", formatNumber(fontSizePx, 4));
+                textElement.setAttribute("font-size", formatNumber(fontSizeMm, 4));
                 textElement.setAttribute("font-family", line.fontFamily);
                 textElement.setAttribute("font-weight", line.fontWeight);
                 textElement.setAttribute("text-anchor", "middle");
                 textElement.setAttribute("dominant-baseline", "alphabetic");
-                if (letterSpacingPx > 0) {
-                    textElement.setAttribute("letter-spacing", formatNumber(letterSpacingPx, 4));
+                if (letterSpacingMm > 0) {
+                    textElement.setAttribute("letter-spacing", formatNumber(letterSpacingMm, 4));
+                }
+                if (toolpathFriendly) {
+                    textElement.setAttribute("fill", "none");
+                    textElement.setAttribute("stroke", settings.textColor);
+                    textElement.setAttribute("stroke-width", "0.1");
+                    textElement.setAttribute("paint-order", "stroke");
                 } else {
-                    textElement.removeAttribute("letter-spacing");
+                    textElement.setAttribute("fill", settings.textColor);
                 }
                 textElement.textContent = textContent;
                 svg.appendChild(textElement);
             }
 
-            currentBaseline += lineSpacingPx;
+            currentBaseline += lineSpacingMm;
         });
     }
 
@@ -782,6 +812,8 @@ function updatePreview() {
 
     const svg = buildSvg(settings);
     previewContainer.innerHTML = "";
+    svg.style.width = `${formatNumber(mmToPx(settings.widthMm + settings.canvasMarginMm * 2) * screenScaleFactor, 2)}px`;
+    svg.style.height = `${formatNumber(mmToPx(settings.heightMm + settings.canvasMarginMm * 2) * screenScaleFactor, 2)}px`;
     previewContainer.appendChild(svg);
 
     persistActiveLabel(settings);
@@ -919,6 +951,38 @@ function attachGlobalListeners() {
     saveProjectBtn.addEventListener("click", downloadProjectFile);
     openProjectBtn.addEventListener("click", () => projectFileInput.click());
     projectFileInput.addEventListener("change", handleProjectFileSelected);
+    toggleDisplaySettingsBtn.addEventListener("click", () => {
+        const isHidden = displaySettingsPanel.hasAttribute("hidden");
+        if (isHidden) {
+            displaySettingsPanel.removeAttribute("hidden");
+        } else {
+            displaySettingsPanel.setAttribute("hidden", "");
+        }
+    });
+
+    screenScalePercentInput.addEventListener("input", () => {
+        const rawPercent = Number(screenScalePercentInput.value);
+        if (!Number.isFinite(rawPercent)) {
+            return;
+        }
+        screenScaleFactor = clamp(rawPercent / 100, 0.5, 2.5);
+        updateCreditCardGuideScale();
+        persistScreenScaleFactor();
+        if (!isHydratingForm) {
+            updatePreview();
+        }
+    });
+
+    resetScreenScaleBtn.addEventListener("click", () => {
+        screenScaleFactor = 1;
+        updateCreditCardGuideScale();
+        persistScreenScaleFactor();
+        updatePreview();
+    });
+
+    toolpathFriendlyInput.addEventListener("change", () => {
+        updatePreview();
+    });
     autoBorderToggle.addEventListener("change", () => {
         updateAutoBorderUIState();
         if (!isHydratingForm) {
@@ -974,6 +1038,8 @@ function attachGlobalListeners() {
 }
 
 function init() {
+    screenScaleFactor = getStoredScreenScaleFactor();
+    updateCreditCardGuideScale();
     attachGlobalListeners();
     const initialLabel = createLabel({ name: "Label 1", settings: getDefaultLabelSettings() });
     projectState.labels.push(initialLabel);
