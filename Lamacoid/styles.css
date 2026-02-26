@@ -260,3 +260,38 @@ textarea {
         grid-template-columns: 1fr;
     }
 }
+
+
+.preview-toolbar {
+    display: flex;
+    justify-content: flex-start;
+}
+
+.display-settings {
+    border: 1px solid #dedede;
+    border-radius: 10px;
+    padding: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    background: #fcfcfc;
+}
+
+.display-settings h3 {
+    margin: 0.25rem 0 0;
+    font-size: 1rem;
+}
+
+.display-settings p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #4c4c4c;
+}
+
+.credit-card-guide {
+    border: 2px dashed #2563eb;
+    border-radius: 8px;
+    background: rgba(37, 99, 235, 0.08);
+    width: 323.53px;
+    height: 204.02px;
+}
